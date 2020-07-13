@@ -1,0 +1,397 @@
+
+.leftandrightspacing {
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.rightspacing {
+}
+
+hr{
+  border:0;
+    text-align: right;
+    margin-right: 10px;
+    width: 95%;
+    height:2px;
+    background:#a6a6a6;
+}
+
+/*
+
+These classes are used for the CNN and Fox-News displays 
+
+*/
+.container{
+    display: flex;
+    justify-content: center;
+    padding-left: 4.5%;
+  padding-right: 1%;
+}
+
+.sub-container{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.card {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  /*border: 5px solid #000; Black border for debugging */
+  border: 1px solid #a6a6a6;
+  height: 460px;
+  align-items: center;
+  flex-shrink: 0;
+  width: 24%;
+  background-color: #e6e6e6;
+  border-radius: 8px 8px 8px 8px; /* Rounded corners */
+  overflow: hidden;
+}
+
+.card img {
+    flex-shrink: 0;
+    width: 100%;
+    height: 133px;
+    border-radius: 3px 3px 3px 3px; /* Rounded corners as per video*/
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.cardtext{
+  border: 5px solid #e6e6e6;
+  text-align: center;
+}
+
+.cardtext h4{
+  font-size: 18px;
+}
+
+.cardtext p{
+  font-size: 15px;
+  padding-right: 1px;
+}
+
+.card a{
+  text-decoration: none;
+  color: #000;
+}
+
+.card a:visited{
+  color: #000;
+}
+
+h2{
+  text-align: center;
+}
+
+
+/* 
+
+The sidebar menu 
+
+*/
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 170px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  background-color: #ffffff; /* white */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px;
+}
+
+/* The navigation menu links */
+.sidenav a {
+  padding-top: 16px;
+  padding-right: 12px;
+  padding-left:6px;
+  padding-bottom:16px;
+  text-decoration: none;
+  font-size: 21px;
+  display: block;
+  text-align: center;
+  background-color: #e6e6e6;
+  color: #333333;   
+  border-radius: 0 2px 2px 0; /* Rounded corners on the top right and bottom right side */
+  border: 1px solid #a6a6a6;
+}
+
+/* The current active link in sidebar */
+.sidenav .active {
+  background-color: #333333;
+  color: #f1f1f1;
+}
+
+/* The current inactive link in sidebar */
+.sidenav .inactive {
+  background-color: #e6e6e6;
+  color: #333333;   
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  background-color: #248f24;
+  color: #f1f1f1;
+}
+
+/* Style page content */
+.main {
+  margin-left: 150px; /* Same as the width of the sidebar */
+  padding: 0px 10px;
+}
+
+
+/* 
+
+The slideshow animation
+
+*/
+* {
+  box-sizing: border-box;
+}
+
+.mySlides {
+  display: flex;
+}
+
+.mySlides img {
+  vertical-align: middle;
+  width:100%;
+  height: 300px;
+}
+
+/* Slideshow container */
+.slideshow-container {
+  position: relative;
+  margin: auto;
+  padding-left: 4.5%;
+  padding-top: 5%;
+  width:70%;
+}
+
+/* Caption text */
+.slideshow-text {
+  color: #fff;
+  position: absolute;
+  bottom: 0px;
+  text-align: center;
+  background-color: #000;
+  opacity: 0.7;
+  height: 50%;
+  width: 93%;
+}
+
+.slideshow-text h4{
+  font-size: 18px;
+}
+
+.slideshow-text p{
+  font-size: 15px;
+}
+
+/*
+
+These classes are used for the Word Cloud 
+
+*/
+
+.topheadlines_and_wordcloud{
+  display:flex;
+}
+
+#my_dataviz{
+  display: flex;
+  background-color: #e6e6e6;
+  margin-top: 5%;
+  width: 300px;
+  height: 300px;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+/*
+
+These are for the search page 
+
+*/
+.search{
+  display: none;
+  margin-left: 200px; /* Same as the width of the sidebar */
+  padding-top: 5%;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.searchmenu{
+  background-color: #e6e6e6;
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+.menu {
+  width: 700px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.button{
+    width: 700px;
+  display: flex;
+  justify-content: center;
+}
+
+button{
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 50px;
+  margin-right: 50px;
+  background-color: #e6e6e6;
+  color: #000;
+  border: none;
+  font-size: 15px;
+}
+
+/*.searchbutton{*/
+button:hover{
+  background-color: #248f24;
+  color: #fff;  
+}
+
+.requiredstar:after { 
+  content:" *"; 
+  color: red;
+}
+
+
+
+/*
+
+These classes are used for the Search Results Cards 
+
+*/
+.results-container{
+    display: flex;
+    justify-content: center;
+    padding-top: 5%;
+    padding-left: 4.5%;
+  padding-right: 2%;
+}
+
+.results-sub-container{
+  display: block;
+}
+
+.results-card {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  /*border: 5px solid #000; Black border for debugging */
+  border: 1px solid #a6a6a6;
+  max-height: 350px;
+  align-items: center;
+  flex-shrink: 0;
+  width: 700px;
+  background-color: #e6e6e6;
+  border-radius: 8px 8px 8px 8px; /* Rounded corners */
+  overflow: hidden;
+  margin: 20px 20px 0 0; 
+  display: flex;
+}
+
+.results-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 3px 3px 3px 3px; /* Rounded corners as per video*/
+    padding: 20px 20px 20px 20px;
+    
+}
+
+.imgcontainer{
+  flex: 0 0 130px; /* don't grow, don't shrink, stay fixed at 150px */
+    display:inline-block;
+}
+
+/*.imgcontainer{
+  width: 15%;
+  float: left;
+  padding-right: 2px;
+  margin-right: 2px;
+  display: flex;
+}*/
+
+/* On mouse-over, add a deeper shadow */
+.results-card:hover {
+  box-shadow: 0 16px 30px 0 rgba(0,0,0,0.2);
+}
+
+.results-cardtext{
+  border: 5px solid #e6e6e6;
+  margin-left: 2px;
+  flex: 600px; /* don't grow, don't shrink, stay fixed at 700px */
+  display:inline-block;
+  min-width:500px;
+  flex-grow: 1000;
+}
+
+.results-cardtext h4{
+  font-size: 18px;
+}
+
+.results-cardtext p{
+  font-size: 15px;
+  padding-right: 1px;
+}
+
+.compressed .results-cardtext p{
+  overflow: hidden;
+  max-height: 17px;
+}
+
+
+.results-card .compressed{
+  display: flex;
+}
+
+.results-card .expanded{
+  display: none;
+}
+
+.searchresults p{
+  margin:5px ;
+}
+
+.searchresults h4{
+  margin:5px ;
+}
+
+.closebutton:after{
+  content: "\d7";
+  padding-right: 20px;
+  padding-top: 10px;
+  font-size: 20px;
+  flex: 0 0 50px; /* don't grow, don't shrink, stay fixed at 230px */
+}
+
+.showmore, .showless{
+    display: none;
+    justify-content: center;
+    padding-top: 25px;
+    padding-left: 4.5%;
+  padding-right: 5%;
+}
+
+#searchresults{
+  display: none;
+}
+
+.noresults{
+  text-align: center;
+}

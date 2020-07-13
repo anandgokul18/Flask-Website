@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html>
+
+<meta charset="utf-8">
+
+<head>
+<title>News Headlines</title>
+
+<link rel="stylesheet" type="text/css" href="static/styles.css"> 
+
+<!-- Top Headlines, CNN and Fox-news Content Script Starts Here-->
+
+<script>
+
+function writeInnerHtml(jsonObj){
+  root=jsonObj.DocumentElement;
+
+  top_headlines = jsonObj.top_headlines.articles;
+  cnn_headlines = jsonObj.cnn_headlines.articles;
+  fox_headlines = jsonObj.fox_headlines.articles;
+
+  var x = document.getElementsByClassName("mySlides");
+
+  for (i=0; i<x.length; i++) { 
+    x[i].getElementsByTagName("a")[0].href = top_headlines[i].url;
+    x[i].getElementsByTagName("img")[0].src = top_headlines[i].urlToImage;
+    x[i].getElementsByTagName("h4")[0].innerText = top_headlines[i].title;
+    x[i].getElementsByTagName("p")[0].innerText = top_headlines[i].description;
+  }
+
+  var y = document.getElementById("cnnheadlines").getElementsByClassName("card")
+
+  for (i=0; i<y.length; i++) { 
+    y[i].getElementsByTagName("a")[0].href = cnn_headlines[i].url;
+    y[i].getElementsByTagName("img")[0].src = cnn_headlines[i].urlToImage;
+    y[i].getElementsByTagName("h4")[0].innerText = cnn_headlines[i].title;
+    y[i].getElementsByTagName("p")[0].innerText = cnn_headlines[i].description;
+  }
+
+  var z = document.getElementById("foxheadlines").getElementsByClassName("card")
+
+  for (i=0; i<z.length; i++) { 
+    z[i].getElementsByTagName("a")[0].href = fox_headlines[i].url;
+    z[i].getElementsByTagName("img")[0].src = fox_headlines[i].urlToImage;
+    z[i].getElementsByTagName("h4")[0].innerText = fox_headlines[i].title;
+    z[i].getElementsByTagName("p")[0].innerText = fox_headlines[i].description;
+  }
+
+}
+
+function loadJSON(url) {
+
+    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+      xmlhttp=new XMLHttpRequest();
+    } else {// code for IE6, IE5
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  
+    }
+    xmlhttp.open("GET",url,false); // "synchronous"
+    
+    xmlhttp.send();
+
+    jsonObj= JSON.parse(xmlhttp.responseText);
+    return jsonObj;   
+}
+
+function homePageFunction(){
+
+  //jsonObj = loadJSON('http://hw6pythonapp-env.eba-8pkmmtyy.us-east-1.elasticbeanstalk.com/news/api/v1.0/homepagearticles'); 
+
+  jsonObj = loadJSON('http://127.0.0.1:5000/news/api/v1.0/homepagearticles');  
+
+   if (window.ActiveXObject) //if IE, simply execute script (due to async prop).
+   {  if (jsonObj.parseError.errorCode != 0) {
+
+        var myErr = jsonObj.parseError;
+        generateError(jsonObj);
+
+      } else {  
+        writeInnerHtml(jsonObj);
+      } 
+
+    } else {//else if FF, execute script once JSON object has loaded
+      jsonObj.onload=writeInnerHtml(jsonObj);
+    } 
+  }
+
+ </script>
+
+<!--The searchpage code-->
+ <script>
+
+  function SearchPage(){
+
+    var el = document.getElementsByClassName("main");
+    el[0].style.display="none";
+
+    var el2 = document.getElementsByClassName("search");
+    el2[0].style.display="block";
+
+    document.getElementById("newslink").classList.replace("active", "inactive");
+    document.getElementById("searchlink").classList.replace("inactive", "active");
+
+  }
+
+ </script> 
+
+<!--The searchpage code-->
+ <script>
+
+  function LoadBackHome(){
+
+    var el = document.getElementsByClassName("main");
+    el[0].style.display="block";
+
+    var el2 = document.getElementsByClassName("search");
+    el2[0].style.display="none";
+
+    document.getElementById("searchlink").classList.replace("active", "inactive");
+    document.getElementById("newslink").classList.replace("inactive", "active");
+
+  }
+
+ </script> 
+
+ <script>
+ //This is for the search button on-click
+
+function doSearch(){
+
+	//Checking if From date is after the to date
+	fromdate = document.getElementById("fromdate").value;
+	var strtDt  = new Date(fromdate);
+	todate = document.getElementById("todate").value;
+	var endDt  = new Date(todate);
+	
+	var flag = 0; // false
+
+	if (endDt <= strtDt){
+   		flag = 1;
+	}
+
+	var regex = /^([2]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/;
+	var result1 = regex.test(fromdate)
+	var result2 = regex.test(todate)
+
+	if(!result1 || !result2){
+		flag=1;
+	}
+
+	if (flag==1){
+   		alert("Incorrect time");
+   		return false;
+	}
+
+
+	function createSearchResults(jsonObj){
+		  root=jsonObj.DocumentElement;
+
+		  try{
+
+		  	document.getElementsByClassName("noresults")[0].innerText=""
+
+		  	//The python backend will return error message sometimes- for too long in the past. Handling that
+		  	if (typeof jsonObj.searchresults.errormessage !== 'undefined') {
+		  		alert(jsonObj.searchresults.errormessage)
+		  		return false;
+		  	}
+
+		  	searchresults = jsonObj.searchresults.articles;
+
+		  }
+		  catch(err){
+		  	//alert("No data available. Error message: "+err.message)
+		  	document.getElementsByClassName("showless")[0].style.display="none";
+		  	document.getElementsByClassName("noresults")[0].innerText=`
+		  	
+
+		  	No Results
+		  	`
+		  	document.getElementById("searchresults").style.display="none";
+		  	return false;
+		  }
+
+		  document.getElementById("searchresults").style.display="block";
+
+		  //Hiding the show less button when researching in show more
+		  document.getElementsByClassName("showless")[0].style.display="none";
+
+		  /*var x = document.getElementById("searchresults").getElementsByClassName("results-card")
+
+		  for (i=0; i<x.length; i++) { 
+		    x[i].getElementsByClassName("compressed")[0].getElementsByTagName("img")[0].src = searchresults[i].image;
+		    x[i].getElementsByClassName("compressed")[0].getElementsByTagName("h4")[0].innerText = searchresults[i].title;
+		    x[i].getElementsByClassName("compressed")[0].getElementsByTagName("p")[0].innerText = searchresults[i].shortdesc;
+
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("img")[0].src = searchresults[i].image;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("h4")[0].innerText = searchresults[i].title;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[0].innerText = searchresults[i].author;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[1].innerText = searchresults[i].source;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[2].innerText = searchresults[i].date;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[3].innerText = searchresults[i].description;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("a")[0].href = searchresults[i].url;
+		  }*/
+
+		var y = document.getElementById("searchresults").getElementsByClassName("results-sub-container")[0].getElementsByClassName("results-separator")[0]		  
+
+		var htmltext=''
+
+		greaterthan5 = false;
+
+		for (i=0; i<searchresults.length; i++) { 
+
+			var text=''
+
+			if(i==5){
+				var text='<div class="greaterthan5">'
+				greaterthan5 = true;
+			}
+
+			text+=`<div class="results-card">
+					<div class="compressed" onclick="toggleExpansion(`+i+`);return false;">
+				  		<div class="imgcontainer"><img src="static/imagenotfound.png"></div>
+				  		<div class="results-cardtext">
+				    		<h4><b>Title Loading...</b></h4> 
+				   			 <p>Description Loading...</p> 
+				  		</div>
+				  	</div>
+					<div class="expanded">
+				  		<div class="imgcontainer"><img src="static/imagenotfound.png"></div>
+				  		<div class="results-cardtext">
+				    		<h4><b>Title Loading...</b></h4> 
+				   			 <p><b>Author: </b> Author Loading...</p> 
+				   			 <p><b>Source: </b>Source Loading...</p> 
+				   			 <p><b>Date: </b>Date Loading...</p> 
+				   			 <p><b>Description: </b>Description Loading...</p> 
+				   			 <a href="_blank" target="_blank">See Original Post</a>
+				  		</div>
+						<div class="closebutton" onclick="toggleExpansion(`+i+`);return false;"></div>
+				  	</div>  
+				</div>`;
+
+			if (i>4 && i==searchresults.length-1){
+				text+="</div>"
+			}
+			htmltext+=text;
+
+		}	
+
+		y.innerHTML=htmltext;
+
+
+		var x = document.getElementById("searchresults").getElementsByClassName("results-card")
+
+		for (i=0; i<searchresults.length; i++) { 
+		    x[i].getElementsByClassName("compressed")[0].getElementsByTagName("img")[0].src = searchresults[i].image;
+		    x[i].getElementsByClassName("compressed")[0].getElementsByTagName("h4")[0].innerText = searchresults[i].title;
+		    x[i].getElementsByClassName("compressed")[0].getElementsByTagName("p")[0].innerText = searchresults[i].shortdesc;
+
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("img")[0].src = searchresults[i].image;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("h4")[0].innerText = searchresults[i].title;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[0].innerHTML = "<b>Author: </b>" +searchresults[i].author;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[1].innerHTML = "<b>Source: </b>"+searchresults[i].source;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[2].innerHTML = "<b>Date: </b>"+searchresults[i].date;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("p")[3].innerText = searchresults[i].description;
+		    x[i].getElementsByClassName("expanded")[0].getElementsByTagName("a")[0].href = searchresults[i].url;
+		  }
+
+		if(greaterthan5){
+			//Hiding actual data
+			document.getElementsByClassName("greaterthan5")[0].style.display="none";
+			//Showing show more button
+			document.getElementsByClassName("showmore")[0].style.display="flex";
+
+		}
+
+	}
+
+	//Crafting the URL for the search query
+	keyword = document.getElementById("keyword").value;
+	category = document.getElementById("category").value;
+	sources = document.getElementById("sources").value;
+
+	
+	searchurl = 'http://127.0.0.1:5000/search/?'+'keyword='+keyword+'&'+'fromdate='+fromdate+'&'+'todate='+todate+'&'+'category='+category+'&'+'sources='+sources;
+
+  	
+  	jsonObj = loadJSON(searchurl);  
+
+   if (window.ActiveXObject) //if IE, simply execute script (due to async prop).
+   {  if (jsonObj.parseError.errorCode != 0) {
+
+        var myErr = jsonObj.parseError;
+        generateError(jsonObj);
+
+      } else {  
+        createSearchResults(jsonObj);
+      } 
+
+    } else {//else if FF, execute script once JSON object has loaded
+      jsonObj.onload=createSearchResults(jsonObj);
+    } 	
+
+
+    return false;
+
+}
+
+ </script>	
+
+<script>
+//This script takes care of showing and rehiding show more button
+
+function unHide(){
+	document.getElementsByClassName("greaterthan5")[0].style.display="block";
+	document.getElementsByClassName("showmore")[0].style.display="none";
+	document.getElementsByClassName("showless")[0].style.display="flex";
+}
+
+function reHide(){
+	document.getElementsByClassName("greaterthan5")[0].style.display="none";
+	document.getElementsByClassName("showmore")[0].style.display="flex";
+	document.getElementsByClassName("showless")[0].style.display="none";
+}
+
+</script>
+
+ <script>
+ //This is for the Clear button on-click
+ 
+ function todayDate(){
+	//To set the default to date
+	var today = new Date();
+	var todaydate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+	//document.getElementById("todate").defaultValue = todaydate;
+	//document.getElementById("fromdate").valueAsDate = new Date(todaydate);
+	return todaydate;
+ }
+
+ function weekAgoDate(){
+	//To set the default from date
+	function daysInMonth (month, year) {
+	    return new Date(year, month, 0).getDate();
+	}
+	var today = new Date();
+
+	var weekagodate= today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-50);
+	if(today.getDate()>7){
+		weekagodate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-7);
+	} else{
+		var difference = today.getDate() + daysInMonth(today.getMonth(),today.getFullYear()) -7 ;
+		weekagodate = today.getFullYear()+'-'+(today.getMonth())+'-'+difference;
+	}
+	//document.getElementById("fromdate").defaultValue = weekagodate;
+	//document.getElementById("fromdate").valueAsDate = new Date(weekagodate);
+	return weekagodate;
+ }
+
+function doClear(){
+	document.getElementById("keyword").value="";
+	document.getElementById("fromdate").valueAsDate = new Date(weekAgoDate());
+	document.getElementById("todate").valueAsDate = new Date(todayDate());
+	document.getElementById("category").value="all";
+	document.getElementById("sources").value="all";
+
+	document.getElementById("searchresults").style.display="none";
+	document.getElementsByClassName("noresults")[0].innerText=""
+}
+ </script>	
+
+<script>
+
+function updateSources(){
+
+	  //Dynamically get the sources from backend
+	  function writeSources(jsonObj){
+	      root=jsonObj.DocumentElement;
+
+	      sources = jsonObj.sources;
+
+	      category = document.getElementById("category").value;
+
+	      var sourceid = document.getElementById("sources");
+
+	      //Adding all
+	      var option1 = document.createElement("option");
+	      option1.text = 'all';
+	      option1.value = 'all';
+	      sourceid.add(option1);
+
+	      for(i=0;i<sources. length;i++){
+	        if(sources[i]['language']=='en' && sources[i]['country']=='us'){
+	        	if(category=='all'){
+	          		var option = document.createElement("option");
+	          		option.text = sources[i]['name'];
+	          		option.value = sources[i]['id']
+	          		sourceid.add(option);
+	          	} else {
+	          		if(sources[i]['category']==category){
+	          			var option = document.createElement("option");
+	          			option.text = sources[i]['name'];
+	          			option.value = sources[i]['id']
+	          			sourceid.add(option);
+	          		}
+
+	          	}
+	        }
+	      }  
+	  }
+
+	  var select = document.getElementById("sources");
+	  var length = select.options.length;
+	  for (i = length-1; i >= 0; i--) {
+  		select.options[i] = null;
+	  }
+	  //console.log(document.getElementById("sources").length)
+
+	  jsonObj = loadJSON('http://127.0.0.1:5000/news/api/v1.0/sourcelist');  
+
+	   if (window.ActiveXObject) //if IE, simply execute script (due to async prop).
+	   {  if (jsonObj.parseError.errorCode != 0) {
+
+	        var myErr = jsonObj.parseError;
+	        generateError(jsonObj);
+
+	      } else {  
+	        writeSources(jsonObj);
+	      } 
+
+	    } else {//else if FF, execute script once JSON object has loaded
+	      jsonObj.onload=writeSources(jsonObj);
+	    } 
+
+}
+
+</script>
+
+<script>
+/*
+	var coll = document.getElementsByClassName("results-card");
+	var i;
+
+	for (i = 0; i < coll.length; i++) {
+
+	  coll[i].addEventListener("click", function() {
+	  	var divI = this.getElementsByClassName("compressed")[0];
+	  	var divII = this.getElementsByClassName("expanded")[0];
+	   
+	       if (divII.style.display === "none") {
+      divI.style.display = "none";
+      divII.style.display = "block";
+
+      //heightofdiv2.classList.replace("results-card", "results-card-expanded");
+    } else {
+      divI.style.display = "block";
+      divII.style.display = "none";
+
+      //heightofdiv2.classList.replace("results-card-expanded", "results-card");
+    }
+
+
+	  });
+	} 
+*/
+  function toggleExpansion(index){
+
+    var div1 = document.getElementById("searchresults").getElementsByClassName("results-card")[index].getElementsByClassName("compressed")[0];
+    var div2 = document.getElementById("searchresults").getElementsByClassName("results-card")[index].getElementsByClassName("expanded")[0];
+    var heightofdiv2 = document.getElementById("searchresults").getElementsByClassName("results-card")[index];
+
+    if (div2.style.display === "none") {
+      div1.style.display = "none";
+      div2.style.display = "flex";
+
+
+      //heightofdiv2.classList.replace("results-card", "results-card-expanded");
+    } else {
+      div1.style.display = "flex";
+      div2.style.display = "none";
+
+      //heightofdiv2.classList.replace("results-card-expanded", "results-card");
+    }
+  }
+
+</script>
+
+
+ </head>
+ 
+<body onload="homePageFunction()">
+
+<div class="leftandrightspacing">
+
+<!-- Side navigation -->
+<div class="sidenav">
+  <a href="#" class='active' id="newslink" onclick="LoadBackHome();return false;">Google News</a>
+  <a href="#" id="searchlink" class="inactive" onclick="SearchPage();return false;">Search</a>
+</div>
+
+<!-- Page content of main starts (this will get hidden on clicking search-->
+<div class="main">
+
+<div class="topheadlines_and_wordcloud">
+
+<!--Top headlines slideshow begins -->
+<div class="slideshow-container">
+
+<div class="mySlides">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+    <div class="slideshow-text">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+</a>
+</div>
+
+<div class="mySlides">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+    <div class="slideshow-text">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+
+<div class="mySlides">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+    <div class="slideshow-text">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+
+<div class="mySlides">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+    <div class="slideshow-text">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+
+<div class="mySlides">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+    <div class="slideshow-text">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+
+</div>
+<br>
+
+<script>
+var slideIndex = 0;
+showSlides();
+
+function showSlides() {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";  
+  }
+  slideIndex++;
+  if (slideIndex > slides.length) {slideIndex = 1}    
+  slides[slideIndex-1].style.display = "block";  
+  setTimeout(showSlides, 3000); // Change image every 3 seconds
+}
+</script>
+<!--Top headlines slideshow ends -->
+
+
+
+<!--D3 Cloud Starts here-->
+<!-- Load d3.js -->
+<script src="static/d3.v4.js"></script>
+<!-- Load d3-cloud -->
+<script src="static/d3.layout.cloud.js"></script>
+<!-- Create a div where the graph will take place -->
+
+<div id="my_dataviz"></div>
+
+<script>
+  //CODE FOR WORD CLOUD STARTS HERE
+// List of words
+//var myWords = [{word: "Running", size: "10"}, {word: "Surfing", size: "20"}, {word: "Climbing", size: "50"}, {word: "Kiting", size: "30"}, {word: "Sailing", size: "20"}, {word: "Snowboarding", size: "60"} ]
+
+function loadJSON(url) {
+
+    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+      xmlhttp=new XMLHttpRequest();
+    } else {// code for IE6, IE5
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  
+    }
+    xmlhttp.open("GET",url,false); // "synchronous"
+    
+    xmlhttp.send();
+
+    jsonObj= JSON.parse(xmlhttp.responseText);
+    return jsonObj;   
+  }
+
+  //jsonObj = loadJSON('http://hw6pythonapp-env.eba-8pkmmtyy.us-east-1.elasticbeanstalk.com/news/api/v1.0/homepagearticles'); 
+
+  jsonObj = loadJSON('http://127.0.0.1:5000/news/api/v1.0/wordcloud');  
+
+  var myWords = jsonObj.most_frequent_results;
+
+// set the dimensions and margins of the graph
+var margin = {top: 0, right: 0, bottom: 0, left: 0},
+    width = 300, //- margin.left - margin.right,
+    height = 300; //- margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+// Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+// Wordcloud features that are different from one word to the other must be here
+var layout = d3.layout.cloud()
+  .size([width, height])
+  .words(myWords.map(function(d) { return {text: d.word, size:d.size}; }))
+  .padding(5)        //space between words
+  .rotate(function() { return ~~(Math.random() * 2) * 90; })
+  .fontSize(function(d) { return d.size+0.25; })      // font size of words
+  .on("end", draw);
+layout.start();
+
+// This function takes the output of 'layout' above and draw the words
+// Wordcloud features that are THE SAME from one word to the other can be here
+function draw(words) {
+  svg
+    .append("g")
+      .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size; })
+        .style("fill", "#000")
+        .attr("text-anchor", "middle")
+        .style("font-family", "Impact")
+        .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";})
+        .text(function(d) { return d.text; });
+}
+//CODE FOR WORD CLOUD ENDS HERE
+</script>
+<!--D3 Cloud Ends here-->
+
+</div>
+
+
+<!--CNN div starts here-->
+<h2>CNN</h2>
+<hr>
+<div class="container" id="cnnheadlines">
+<div class="sub-container">
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+  <div class="cardtext">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+  <div class="cardtext">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png" >
+  <div class="cardtext">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+    <div class="cardtext">
+  <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+</div>
+</div>
+<!--CNN div ends here-->
+
+<br>
+<br> 
+
+<!--Fox div starts here-->
+<h2>Fox News</h2>
+<hr>
+<div class="container" id="foxheadlines">
+<div class="sub-container">
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png">
+  <div class="cardtext">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png" >
+  <div class="cardtext">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png"  >
+  <div class="cardtext">
+    <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+<div class="card">
+  <a href="" target="_blank">
+  <img src="static/imagenotfound.png" >
+    <div class="cardtext">
+  <h4><b>Title Loading...</b></h4> 
+    <p>Description Loading...</p> 
+  </div>
+  </a>
+</div>
+</div>
+</div>
+<!--Fox div ends here-->
+
+</div>
+<!-- Page content of main ends-->
+
+<!-- Page content of search starts (this gets unhidden on clicking search-->
+<div class="search">
+
+<div class="searchmenu">
+<form onload="doClear()" onsubmit="doSearch(); return false" action="/search/">
+  <div class="menu">
+  <label for="keyword"  class="requiredstar">Keyword </label>
+  <input type="text" id="keyword" name="keyword" required autofocus>
+
+
+  <label for="fromdate"  class="requiredstar">From </label>
+  <input type="date" id="fromdate" name="fromdate" required>
+
+  <label for="todate" class="requiredstar">To </label>
+  <input type="date" id="todate" name="todate" required>
+
+<script>
+ //This is for the Clear button on-click
+ 
+	//To set the default to date
+	var today = new Date();
+	var todaydate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+	//document.getElementById("todate").defaultValue = todaydate;
+	document.getElementById("todate").valueAsDate = new Date(todaydate);
+
+	//To set the default from date
+	function daysInMonth (month, year) {
+	    return new Date(year, month, 0).getDate();
+	}
+	var today = new Date();
+
+	var weekagodate= today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-50);
+	if(today.getDate()>7){
+		weekagodate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-7);
+	} else{
+		var difference = today.getDate() + daysInMonth(today.getMonth(),today.getFullYear()) -7 ;
+		weekagodate = today.getFullYear()+'-'+(today.getMonth())+'-'+difference;
+	}
+	//document.getElementById("fromdate").defaultValue = weekagodate;
+	document.getElementById("fromdate").valueAsDate = new Date(weekagodate);
+</script>
+
+</div>
+  <br>
+  <div class="menu">
+  <label for="category" >Category </label>
+  <select id="category" name="category" onchange="updateSources()">
+  <option value="all" selected>all</option>
+  <option value="business">Business</option>
+  <option value="entertainment">Entertainment</option>
+  <option value="general">General</option>
+  <option value="health">Health</option>
+  <option value="science">Science</option>
+  <option value="sports">Sports</option>
+  <option value="technology">Technology</option>
+  </select>
+
+  <label for="sources">Source </label>
+  <select id="sources" name="sources">
+  	<option value="all" selected>all</option>
+	  <script>
+	  //Dynamically get the sources from backend
+	  function writeSources(jsonObj){
+	      root=jsonObj.DocumentElement;
+
+	      sources = jsonObj.sources;
+
+	      var sourceid = document.getElementById("sources");
+	      for(i=0;i<sources. length;i++){
+	        if(sources[i]['language']=='en' && sources[i]['country']=='us'){
+	          var option = document.createElement("option");
+	          option.text = sources[i]['name'];
+	          option.value = sources[i]['id']
+	          sourceid.add(option);
+	        }
+	      }  
+	  }
+
+	  jsonObj = loadJSON('http://127.0.0.1:5000/news/api/v1.0/sourcelist');  
+
+	   if (window.ActiveXObject) //if IE, simply execute script (due to async prop).
+	   {  if (jsonObj.parseError.errorCode != 0) {
+
+	        var myErr = jsonObj.parseError;
+	        generateError(jsonObj);
+
+	      } else {  
+	        writeSources(jsonObj);
+	      } 
+
+	    } else {//else if FF, execute script once JSON object has loaded
+	      jsonObj.onload=writeSources(jsonObj);
+	    } 
+	 </script>
+  </select>
+</div>
+
+<br>
+<div class="button">
+<button type="submit" class='searchbutton'>Search</button>
+<button type="button" onclick="doClear()">Clear</button>
+</div>
+
+</form>  
+</div>
+
+<!--To show No Results-->
+<div class="noresults"></div>
+
+<!-- The results of search will be displayed here-->
+<div class="searchresults">
+
+<div class="results-container" id="searchresults">
+<div class="results-sub-container">
+<div class="results-separator">
+<!--
+<div class="results-card" onclick="toggleExpansion();return false;">
+	<div class="compressed">
+  		<img src="static/imagenotfound.png">
+  		<div class="results-cardtext">
+    		<h4><b>Title Loading...</b></h4> 
+   			 <p>Description Loading...</p> 
+  		</div>
+  	</div>
+	<div class="expanded">
+  		<img src="static/imagenotfound.png">
+  		<div class="results-cardtext">
+    		<h4><b>Title Loading...</b></h4> 
+   			 <p><b>Author: </b> Author Loading...</p> 
+   			 <p><b>Source: </b>Source Loading...</p> 
+   			 <p><b>Date: </b>Date Loading...</p> 
+   			 <p><b>Description: </b>Description Loading...</p> 
+   			 <a href="_blank">See Original Post</a>
+  		</div>
+  	</div>  	
+</div>
+
+<div class="results-card" onclick="toggleExpansion();return false;">
+	<div class="compressed">
+  		<img src="static/imagenotfound.png">
+  		<div class="results-cardtext">
+    		<h4><b>Title Loading...</b></h4> 
+   			 <p>Description Loading...</p> 
+  		</div>
+  	</div>
+	<div class="expanded">
+  		<img src="static/imagenotfound.png">
+  		<div class="results-cardtext">
+    		<h4><b>Title Loading...</b></h4> 
+   			 <p><b>Author: </b> Author Loading...</p> 
+   			 <p><b>Source: </b>Source Loading...</p> 
+   			 <p><b>Date: </b>Date Loading...</p> 
+   			 <p><b>Description: </b>Description Loading...</p> 
+   			 <a href="_blank">See Original Post</a>
+  		</div>
+  	</div>  	
+</div>
+-->
+</div>	
+<div class="showmore">
+	<button onclick="unHide()"> Show More</button>
+</div>
+<div class="showless">
+	<button onclick="reHide()"> Show Less</button>
+</div>
+</div>
+</div>  
+</div>
+
+</div>
+<!-- Page content of search ends-->
+
+</div>
+<!-- Page content of leftandrightspacing ends (this is the main wrapper)-->
+
+</body>	
+
+</html>
